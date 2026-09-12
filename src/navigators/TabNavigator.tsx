@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import ProgressScreen from "../screeens/ProgressScreen";
-import ChestDetailScreen from "../screeens/ChestDetailScreen";
+import RoutineListScreen from "../screeens/RoutineListScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -31,7 +31,7 @@ export default function TabNavigator() {
             />
             <Tab.Screen
                 name='RutinasTab'
-                component={ChestDetailScreen}
+                component={RoutineListScreen}
                 options={{ title: 'Rutinas' }}
             />
         </Tab.Navigator>
