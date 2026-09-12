@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DrawerNavigator from './src/navigators/DrawerNavigator';
 import ChestDetailScreen from './src/screeens/ChestDetailScreen';
 
+
 //DICCIONARIO
 export type RootStackParamList={
   MainDrawer:undefined;
