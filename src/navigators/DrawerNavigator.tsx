@@ -10,17 +10,7 @@ const Drawer = createDrawerNavigator();
 export default function DrawerNavigator() {
     return (
         <Drawer.Navigator initialRouteName="MiEntrenamiento">
-            <Drawer.Screen
-                name='Configuracion'
-                component={SettingsScreen}
-                options={{
-                    title: 'Configuración',
-                    drawerIcon: ({ color, size }) => (
-                        <Ionicons name="settings" size={size} color={color} />
 
-                    )
-                }}
-            />
             <Drawer.Screen
                 name='MiEntrenamiento'
                 component={TabNavigator}
@@ -33,6 +23,17 @@ export default function DrawerNavigator() {
 
                 }}
 
+            />
+            <Drawer.Screen
+                name='Configuracion'
+                component={SettingsScreen}
+                options={{
+                    title: 'Configuración',
+                    drawerIcon: ({ color, size }) => (
+                        <Ionicons name="settings" size={size} color={color} />
+
+                    )
+                }}
             />
 
 
