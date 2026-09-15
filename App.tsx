@@ -7,6 +7,7 @@ import DrawerNavigator from './src/navigators/DrawerNavigator';
 import ChestDetailScreen from './src/screeens/ChestDetailScreen';
 import { RoutineProvider } from './src/context/RoutineContext';
 
+
 //DICCIONARIO
 export type RootStackParamList = {
   MainDrawer: undefined;
@@ -30,7 +31,7 @@ export default function App() {
           <Stack.Screen
             name='ChestDetail'
             component={ChestDetailScreen}
-            options={{ headerShown: true, title: 'ChestDetailScreen' }}
+            options={{ headerShown: true, title: 'Detalle de Rutina' }}
           />
         </Stack.Navigator>
       </NavigationContainer>
