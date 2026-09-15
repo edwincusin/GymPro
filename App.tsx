@@ -5,34 +5,36 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DrawerNavigator from './src/navigators/DrawerNavigator';
 import ChestDetailScreen from './src/screeens/ChestDetailScreen';
-
+import { RoutineProvider } from './src/context/RoutineContext';
 
 //DICCIONARIO
-export type RootStackParamList={
-  MainDrawer:undefined;
-  ChestDetail:undefined
+export type RootStackParamList = {
+  MainDrawer: undefined;
+  ChestDetail: undefined
 }
 
-const Stack=createNativeStackNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <StatusBar style='light'/>
+    <RoutineProvider>
+      <NavigationContainer>
+        <StatusBar style='light' />
 
-      <Stack.Navigator initialRouteName='MainDrawer'>
-        <Stack.Screen 
-          name='MainDrawer'
-          component={DrawerNavigator}
-          options={{headerShown:false}}
-        />
-        <Stack.Screen
-          name='ChestDetail'
-          component={ChestDetailScreen}
-          options={{headerShown:true, title:'ChestDetailScreen'}}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+        <Stack.Navigator initialRouteName='MainDrawer'>
+          <Stack.Screen
+            name='MainDrawer'
+            component={DrawerNavigator}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name='ChestDetail'
+            component={ChestDetailScreen}
+            options={{ headerShown: true, title: 'ChestDetailScreen' }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </RoutineProvider>
   );
 }
 
