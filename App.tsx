@@ -4,14 +4,14 @@ import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DrawerNavigator from './src/navigators/DrawerNavigator';
-import ChestDetailScreen from './src/screeens/ChestDetailScreen';
+import RoutineDetailScreen from './src/screeens/RoutineDetailScreen';
 import { RoutineProvider } from './src/context/RoutineContext';
 import AddRoutineScreen from './src/screeens/AddRoutineScreen';
 
 //DICCIONARIO
 export type RootStackParamList = {
   MainDrawer: undefined;
-  ChestDetail: undefined
+  Detail: undefined
   AddRoutine: { id?: string | undefined }
 
 }
@@ -31,8 +31,8 @@ export default function App() {
             options={{ headerShown: false }}
           />
           <Stack.Screen
-            name='ChestDetail'
-            component={ChestDetailScreen}
+            name='Detail'
+            component={RoutineDetailScreen}
             options={{ headerShown: true, title: 'Detalle de Rutina' }}
           />
           <Stack.Screen

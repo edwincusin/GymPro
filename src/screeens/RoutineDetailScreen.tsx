@@ -2,7 +2,7 @@ import {  Text,StyleSheet, View} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoutine } from '../context/RoutineContext';
 
-export default function ChestDetailScreen({route}:any) {
+export default function RoutineDetailScreen({route}:any) {
   
   const idToView=route.params?.id;
   const {routines}=useRoutine();
