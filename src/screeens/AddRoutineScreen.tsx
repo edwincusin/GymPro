@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet,Platform, KeyboardAvoidingView, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Platform, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoutine } from '../context/RoutineContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,6 +10,7 @@ export default function AddRoutineScreen({ route, navigation }: any) {
     const [name, setName] = useState('');
     const [grupoMuscular, setGrupoMuscular] = useState('');
     const [duracion, setDuracion] = useState('');
+    const [showSuccess, setShowSuccess] = useState(false);
 
     const idToEdit = route.params?.id;
 
@@ -30,18 +31,25 @@ export default function AddRoutineScreen({ route, navigation }: any) {
 
     const handleSave = () => {
         if (!name || !grupoMuscular || !duracion) {
-            return Alert.alert("Todos los campos son obligatorios para continuar");
+            return Alert.alert("ERROR", "Todos los campos son obligatorios para continuar");
         }
         const duracionNumber = parseInt(duracion);
         if (isNaN(duracionNumber)) {
-            return Alert.alert("El campo duracion debe ser un numero entero")
+            return Alert.alert("ERROR", "El campo duracion debe ser un numero entero")
         }
         if (idToEdit) {
             updateRoutine(idToEdit, { name: name, duration: duracionNumber, muscleGroup: grupoMuscular })
         } else {
             addRoutine({ name: name, duration: duracionNumber, muscleGroup: grupoMuscular })
         }
-        navigation.goBack();
+        // Mostrar mensaje de éxito
+        setShowSuccess(true);
+
+        // Ocultarlo después de 2 segundos y luego volver atrás
+        setTimeout(() => {
+            setShowSuccess(false);
+            navigation.goBack();
+        }, 2000);
     }
 
     return (
@@ -63,7 +71,7 @@ export default function AddRoutineScreen({ route, navigation }: any) {
                         <View style={styles.iconCircle}>
                             <Ionicons name='barbell-outline' size={32} color="#3b82f6" />
                         </View>
-                        <Text style={styles.title}>Nueva Rutina</Text>
+                        
                     </View>
 
                     {/* Tarjeta contenedora del formulario */}
@@ -111,6 +119,12 @@ export default function AddRoutineScreen({ route, navigation }: any) {
                         </TouchableOpacity>
 
                     </View>
+                    {showSuccess && (
+                        <View style={styles.toast}>
+                            <Ionicons name="checkmark-circle" size={20} color="#fff" />
+                            <Text style={styles.toastText}>Guardado con éxito</Text>
+                        </View>
+                    )}
                 </ScrollView>
             </KeyboardAvoidingView>
         </SafeAreaView>
@@ -212,5 +226,28 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 15,
         fontWeight: '600',
+    },
+    toast: {
+        position: 'absolute',
+        bottom: 40,
+        alignSelf: 'center',
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#16a34a',
+        paddingVertical: 10,
+        paddingHorizontal: 18,
+        borderRadius: 30,
+        gap: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+        elevation: 5,
+    },
+
+    toastText: {
+        color: '#fff',
+        fontWeight: '600',
+        fontSize: 14,
     },
 });
