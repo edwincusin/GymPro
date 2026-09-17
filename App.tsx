@@ -6,12 +6,14 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DrawerNavigator from './src/navigators/DrawerNavigator';
 import ChestDetailScreen from './src/screeens/ChestDetailScreen';
 import { RoutineProvider } from './src/context/RoutineContext';
-
+import AddRoutineScreen from './src/screeens/AddRoutineScreen';
 
 //DICCIONARIO
 export type RootStackParamList = {
   MainDrawer: undefined;
   ChestDetail: undefined
+  AddRoutine: { id?: string | undefined }
+
 }
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -32,6 +34,13 @@ export default function App() {
             name='ChestDetail'
             component={ChestDetailScreen}
             options={{ headerShown: true, title: 'Detalle de Rutina' }}
+          />
+          <Stack.Screen
+            name='AddRoutine'
+            component={AddRoutineScreen}
+            options={({route})=>{
+              return {title:route.params?.id?'Editar Rutina':"Nueva rutina"}
+            }}
           />
         </Stack.Navigator>
       </NavigationContainer>
