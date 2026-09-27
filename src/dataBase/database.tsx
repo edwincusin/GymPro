@@ -11,12 +11,11 @@ export const initDatabase = async (db: SQLite.SQLiteDatabase) => {
         `
          PRAGMA journal_mode = WAL;
         CREATE TABLE IF NOT EXISTS routines (
-            id TEXT PRIMARY KEY NOT NULL,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             muscleGroup TEXT NOT NULL,
             duration INTEGER NOT NULL,
-            createAt TEXT NOT NULL,
-            featured INTEGER NOT NULL DEFAULT 0
+            createAt TEXT NOT NULL
         );
         `
     );
