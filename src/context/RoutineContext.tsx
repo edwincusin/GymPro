@@ -1,8 +1,9 @@
-import React, { createContext, useState, useContext, ReactNode } from "react";
+import React, { createContext, useState, useContext, ReactNode, useCallback, useEffect } from "react";
+import { useSQLiteContext } from "expo-sqlite";
 
 //DEFINIR DEL TIPO DE RUTINA
 export type Routine = {
-    id: string;
+    id: number;
     name: string;
     muscleGroup: string;
     duration: number;
@@ -15,8 +16,8 @@ export type Routine = {
 type RoutineContextType = {
     routines: Routine[];
     addRoutine: (routine: Omit<Routine, 'id' | 'createAt'>) => void;
-    updateRoutine: (id: string, routine: Omit<Routine, 'id' | 'createAt'>) => void;
-    deleteRoutine: (id: string) => void;
+    updateRoutine: (id: number, routine: Omit<Routine, 'id' | 'createAt'>) => void;
+    deleteRoutine: (id: number) => void;
 }
 
 // Se crea el contexto. Se inicializa en 'undefined' para poder detectar
@@ -27,50 +28,63 @@ const RoutineContext = createContext<RoutineContextType | undefined>(undefined);
 // Componente "proveedor - o provider": envuelve a la app (o parte de ella) y le da acceso a las funciones
 export function RoutineProvider({ children }: { children: ReactNode }) {
 
-    // Estado local que guarda el array de productos
-    const [routines, setRoutines] = useState<Routine[]>([
-        {
-            id: '1',
-            name: 'Pecho y Tríceps',
-            muscleGroup: 'Pecho',
-            duration: 45,
-            createAt: new Date().toLocaleDateString(),
-        },
-        {
-            id: '2',
-            name: 'Espalda y Bíceps',
-            muscleGroup: 'Espalda',
-            duration: 50,
-            createAt: new Date().toLocaleDateString(),
-        },
-        {
-            id: '3',
-            name: 'Pierna Completa',
-            muscleGroup: 'Piernas',
-            duration: 60,
-            createAt: new Date().toLocaleDateString(),
-        },
-    ]);
+    const dataBase = useSQLiteContext();
+    const [routines, setRoutines] = useState<Routine[]>([]);
+    const [cargando, setCargando] = useState(false);
 
-    // CREAR UNA RUTINA sin id y createAt ya que son automaticos
-    const addRoutine = (routine: Omit<Routine, 'id' | 'createAt'>) => {
-        const newRoutine = {
-            ...routine,
-            id: Date.now().toString(),
-            createAt: new Date().toLocaleDateString(),
+    const cargarRoutines = useCallback(async () => {
+        setCargando(true);
+        try {
+            const resultado = await dataBase.getAllAsync<Routine>(
+                'SELECT * FROM routines ORDER BY id DESC'
+            );
+            setRoutines(resultado);
+        } catch (error) {
+            console.log("Error al cargar rutinas desde el context:", error);
+        } finally {
+            setCargando(false);
         }
-        setRoutines([...routines, newRoutine]);
+    }, [dataBase]);
+
+    // Carga inicial al montar el Provider
+    useEffect(() => {
+        cargarRoutines();
+    }, [cargarRoutines]);
+
+    const addRoutine = async (routine: Omit<Routine, 'id' | 'createAt'>) => {
+        const createAt = new Date().toLocaleDateString();
+        try {
+            await dataBase.runAsync(
+                'INSERT INTO routines (name, muscleGroup, duration, createAt) VALUES (?,?,?,?)',
+                [routine.name, routine.muscleGroup, routine.duration, createAt]
+            );
+            await cargarRoutines();
+        } catch (error) {
+            console.log("Error al agregar rutina desde el context:", error);
+        }
     }
 
-    // ACTUALIZAR RUTINA 
-    const updateRoutine = (id: string, routineEdit: Omit<Routine, 'id' | 'createAt'>) => {
-        setRoutines(routines.map(r => (r.id === id ? { ...r, ...routineEdit } : r)))
+    const updateRoutine = async (id: number, routineEdit: Omit<Routine, 'id' | 'createAt'>) => {
+        try {
+            await dataBase.runAsync(
+                'UPDATE routines SET name=?, muscleGroup=?, duration=? WHERE id=?',
+                [routineEdit.name, routineEdit.muscleGroup, routineEdit.duration, id]
+            );
+            await cargarRoutines();
+        } catch (error) {
+            console.log("Error al actualizar rutina desde el context :", error);
+        }
     }
 
-    //ELIMINAR RUTINA 
-    const deleteRoutine = (id: string) => {
-        setRoutines(routines.filter(r => (r.id !== id)))
+    const deleteRoutine = async (id: number) => {
+        try {
+            await dataBase.runAsync('DELETE FROM routines WHERE id=?', [id]);
+            await cargarRoutines();
+        } catch (error) {
+            console.log("Error al eliminar rutina desde el context:", error);
+        }
     }
+
 
     // El Provider expone el estado y las funciones a todos los "children"
     // (todo componente hijo podrá leer/modificar etc)
