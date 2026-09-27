@@ -53,7 +53,7 @@ export default function App() {
             name='AddRoutine'
             component={AddRoutineScreen}
             options={({route})=>{
-              return {title:route.params?.id?'Editar Rutina':"Nueva rutina"}
+              return {title:route.params?.id?'Editar Rutina':"Nueva rutina", headerShown:true}
             }}
           />
         </Stack.Navigator>
