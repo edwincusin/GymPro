@@ -15,7 +15,7 @@ import { initDatabase } from './src/dataBase/database';
 //DICCIONARIO
 export type RootStackParamList = {
   MainDrawer: undefined;
-  Detail: undefined
+  Detail: { id?: number }
   AddRoutine: { id?: number | undefined }
 
 }

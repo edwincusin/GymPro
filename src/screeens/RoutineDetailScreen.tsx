@@ -1,142 +1,204 @@
-import {  Text,StyleSheet, View} from 'react-native';
+import { Text, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { useRoutine } from '../context/RoutineContext';
 
-export default function RoutineDetailScreen({route}:any) {
-  
-  const idToView=route.params?.id;
-  const {routines}=useRoutine();
+export default function RoutineDetailScreen({ route }: any) {
 
-  const routineFound=routines.find(r=>(r.id==idToView));
-if (!routineFound) {
+  const idToView: number = route.params?.id;
+  const { routines } = useRoutine();
+
+  const routineFound = routines.find(r => r.id === idToView);
+
+  if (!routineFound) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.notFoundBox}>
+          <Ionicons name="alert-circle-outline" size={40} color="#9A93A8" />
+          <Text style={styles.notFound}>Rutina no encontrada</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.notFound}>Rutina no encontrada</Text>
+      <View style={styles.card}>
+
+        {/* Ícono principal grande */}
+        <View style={styles.iconHeader}>
+          <View style={styles.iconCircle}>
+            <Ionicons name="barbell-outline" size={30} color="#FF4D4D" />
+          </View>
+        </View>
+
+        <View style={styles.headerSection}>
+          <View style={styles.nameRow}>
+            {routineFound.featured && (
+              <Ionicons name="star" size={18} color="#FFC700" style={{ marginRight: 6 }} />
+            )}
+            <Text style={styles.name}>{routineFound.name}</Text>
+          </View>
+          <View style={styles.badge}>
+            <Ionicons name="body-outline" size={13} color="#FF4D4D" />
+            <Text style={styles.badgeText}>{routineFound.muscleGroup}</Text>
+          </View>
+        </View>
+
+        <View style={styles.divider} />
+
+        <View style={styles.row}>
+          <View style={styles.rowIconCircle}>
+            <Ionicons name="finger-print-outline" size={16} color="#60A5FA" />
+          </View>
+          <View>
+            <Text style={styles.label}>Identificador</Text>
+            <Text style={styles.value}>#{routineFound.id}</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <View style={styles.rowIconCircle}>
+            <Ionicons name="time-outline" size={16} color="#22C55E" />
+          </View>
+          <View>
+            <Text style={styles.label}>Duración</Text>
+            <Text style={styles.value}>{routineFound.duration} min</Text>
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <View style={styles.rowIconCircle}>
+            <Ionicons name="calendar-outline" size={16} color="#FFC700" />
+          </View>
+          <View>
+            <Text style={styles.label}>Fecha de creación</Text>
+            <Text style={styles.value}>{routineFound.createAt}</Text>
+          </View>
+        </View>
+
+        {routineFound.featured && (
+          <View style={styles.featuredNote}>
+            <Ionicons name="star" size={14} color="#FFC700" />
+            <Text style={styles.featuredNoteText}>Esta es tu rutina destacada</Text>
+          </View>
+        )}
+
+      </View>
     </SafeAreaView>
   );
 }
 
-return (
-  <SafeAreaView style={styles.container}>
-    <View style={styles.card}>
-
-      {/* Encabezado con nombre y badge del grupo muscular */}
-      <View style={styles.headerSection}>
-        <Text style={styles.name}>{routineFound.name}</Text>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{routineFound.muscleGroup}</Text>
-        </View>
-      </View>
-
-      <View style={styles.divider} />
-
-      {/* Fila de detalle: ID */}
-      <View style={styles.row}>
-        <Text style={styles.label}>Identificador</Text>
-        <Text style={styles.value}>{routineFound.id}</Text>
-      </View>
-
-      {/* Fila de detalle: duración */}
-      <View style={styles.row}>
-        <Text style={styles.label}>Duración</Text>
-        <Text style={styles.value}>{routineFound.duration} min</Text>
-      </View>
-
-      {/* Fila de detalle: fecha de creación */}
-      <View style={styles.row}>
-        <Text style={styles.label}>Fecha de creación</Text>
-        <Text style={styles.value}>{routineFound.createAt}</Text>
-      </View>
-
-    </View>
-  </SafeAreaView>
-);
-}
-
 const styles = StyleSheet.create({
-  // Fondo general de la pantalla
   container: {
     flex: 1,
-    backgroundColor: '#f4f5f7',
+    backgroundColor: '#14141C',
     padding: 20,
     justifyContent: 'center',
   },
-
-  // Mensaje cuando no se encuentra la rutina
+  notFoundBox: {
+    alignItems: 'center',
+    gap: 12,
+  },
   notFound: {
     fontSize: 16,
-    color: '#6b7280',
+    color: '#9A93A8',
     textAlign: 'center',
   },
-
-  // Tarjeta blanca contenedora del detalle
   card: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#1E1E28',
     borderRadius: 16,
     padding: 24,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 2,
+    borderColor: '#2E2E3A',
   },
-
-  // Sección superior: nombre + badge
-  headerSection: {
+  iconHeader: {
+    alignItems: 'center',
     marginBottom: 16,
   },
-
-  // Nombre de la rutina
-  name: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#111827',
-    marginBottom: 8,
+  iconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: 'rgba(255, 77, 77, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-
-  // Chip/badge del grupo muscular
+  headerSection: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  name: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
   badge: {
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255, 77, 77, 0.15)',
     paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingVertical: 5,
     borderRadius: 20,
   },
-
   badgeText: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#3b82f6',
+    fontWeight: '700',
+    color: '#FF4D4D',
   },
-
-  // Línea divisoria
   divider: {
     height: 1,
-    backgroundColor: '#e5e7eb',
+    backgroundColor: '#2E2E3A',
     marginBottom: 20,
   },
-
-  // Fila de cada dato
   row: {
-    marginBottom: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    marginBottom: 18,
   },
-
-  // Etiqueta pequeña (ej: "Duración")
+  rowIconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#14141C',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   label: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#9ca3af',
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#9A93A8',
     textTransform: 'uppercase',
     letterSpacing: 0.8,
     marginBottom: 3,
   },
-
-  // Valor del dato
   value: {
     fontSize: 15,
-    color: '#1f2937',
-    lineHeight: 21,
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  featuredNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 8,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#2E2E3A',
+  },
+  featuredNoteText: {
+    fontSize: 13,
+    color: '#FFC700',
+    fontWeight: '600',
   },
 });
