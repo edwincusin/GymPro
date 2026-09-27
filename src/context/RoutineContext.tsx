@@ -8,6 +8,7 @@ export type Routine = {
     muscleGroup: string;
     duration: number;
     createAt: string;
+    featured: boolean;
 }
 
 
@@ -15,15 +16,19 @@ export type Routine = {
 // para cualquier componente que consuma este contexto
 type RoutineContextType = {
     routines: Routine[];
-    addRoutine: (routine: Omit<Routine, 'id' | 'createAt'>) => void;
-    updateRoutine: (id: number, routine: Omit<Routine, 'id' | 'createAt'>) => void;
-    deleteRoutine: (id: number) => void;
+    addRoutine: (routine: Omit<Routine, 'id' | 'createAt' | 'featured'>) => Promise<void>;
+    updateRoutine: (id: number, routine: Omit<Routine, 'id' | 'createAt' | 'featured'>) => Promise<void>;
+    deleteRoutine: (id: number) => Promise<void>;
+    cargando: boolean;
+    setFeaturedRoutine: (id: number) => Promise<void>;
 }
 
 // Se crea el contexto. Se inicializa en 'undefined' para poder detectar
 // si alguien intenta usarlo fuera del Provider
 const RoutineContext = createContext<RoutineContextType | undefined>(undefined);
 
+// Fila cruda tal como sale de SQLite (featured llega como 0/1, no boolean)
+type RoutineRow = Omit<Routine, 'featured'> & { featured: number };
 
 // Componente "proveedor - o provider": envuelve a la app (o parte de ella) y le da acceso a las funciones
 export function RoutineProvider({ children }: { children: ReactNode }) {
@@ -35,10 +40,16 @@ export function RoutineProvider({ children }: { children: ReactNode }) {
     const cargarRoutines = useCallback(async () => {
         setCargando(true);
         try {
-            const resultado = await dataBase.getAllAsync<Routine>(
+            const resultado = await dataBase.getAllAsync<RoutineRow>(
                 'SELECT * FROM routines ORDER BY id DESC'
             );
-            setRoutines(resultado);
+            // Convierte featured de 0/1 (SQLite) a boolean (JS/TypeScript)
+            const convertidas: Routine[] = resultado.map(r => ({
+                ...r, featured: r.featured === 1,
+            }));
+
+            setRoutines(convertidas);
+
         } catch (error) {
             console.log("Error al cargar rutinas desde el context:", error);
         } finally {
@@ -51,7 +62,7 @@ export function RoutineProvider({ children }: { children: ReactNode }) {
         cargarRoutines();
     }, [cargarRoutines]);
 
-    const addRoutine = async (routine: Omit<Routine, 'id' | 'createAt'>) => {
+    const addRoutine = async (routine: Omit<Routine, 'id' | 'createAt' | 'featured'>) => {
         const createAt = new Date().toLocaleDateString();
         try {
             await dataBase.runAsync(
@@ -64,7 +75,7 @@ export function RoutineProvider({ children }: { children: ReactNode }) {
         }
     }
 
-    const updateRoutine = async (id: number, routineEdit: Omit<Routine, 'id' | 'createAt'>) => {
+    const updateRoutine = async (id: number, routineEdit: Omit<Routine, 'id' | 'createAt' | 'featured'>) => {
         try {
             await dataBase.runAsync(
                 'UPDATE routines SET name=?, muscleGroup=?, duration=? WHERE id=?',
@@ -85,11 +96,20 @@ export function RoutineProvider({ children }: { children: ReactNode }) {
         }
     }
 
+    const setFeaturedRoutine = async (id: number) => {
+        try {
+            await dataBase.runAsync('UPDATE routines SET featured = 0');
+            await dataBase.runAsync('UPDATE routines SET featured = 1 WHERE id = ?', [id]);
+            await cargarRoutines();
+        } catch (error) {
+            console.log("Error al marcar rutina destacada  desde el context:: ", error);
+        }
+    }
 
     // El Provider expone el estado y las funciones a todos los "children"
     // (todo componente hijo podrá leer/modificar etc)
     return (
-        <RoutineContext.Provider value={{ routines, addRoutine, deleteRoutine, updateRoutine }}>
+        <RoutineContext.Provider value={{ routines, addRoutine, deleteRoutine, updateRoutine, setFeaturedRoutine, cargando }}>
             {children}
         </RoutineContext.Provider>
     )

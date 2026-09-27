@@ -15,7 +15,8 @@ export const initDatabase = async (db: SQLite.SQLiteDatabase) => {
             name TEXT NOT NULL,
             muscleGroup TEXT NOT NULL,
             duration INTEGER NOT NULL,
-            createAt TEXT NOT NULL
+            createAt TEXT NOT NULL,
+            featured INTEGER NOT NULL DEFAULT 0
         );
         `
     );
